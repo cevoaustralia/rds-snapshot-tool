@@ -12,20 +12,27 @@ The Snapshot Tool for RDS automates the task of creating manual snapshots, copyi
 
 You will need to build from source and deploy to your own bucket in your own account. To build, you need to be on a unix-like system (e.g., macOS or some flavour of Linux) and you need to have `make` and `zip`.
 
-1. Create an S3 bucket to hold the Lambda function zip files. The bucket must be in the same region where the Lambda functions will run. And the Lambda functions must run in the same region as the RDS instances.
+To deploy there is now a parent `Makefile` that makes this easy to deploy.
 
-1. Clone the repository
-
-1. Edit the `Makefile` file and set `S3DEST` to be the bucket name where you want the functions to go. Set the `AWSARGS`, `AWSCMD` and `ZIPCMD` variables as well.
-
-1. Type `make` at the command line. It will call `zip` to make the zip files, and then it will call `aws s3 cp` to copy the zip files to the bucket you named.
-
-1. Be sure to use the correct bucket name in the `CodeBucket` parameter when launching the stack in both accounts.
-
-
-To deploy on your accounts, you will need to use the Cloudformation templates provided.
-* Deploy `snapshot_tool_rds_source.json` in the source account (the account that runs the RDS instances)
-* Deploy `snapshot_tool_rds_dest.json` in the destination account (the account where you'd like to keep your snapshots)
+* Setup your environment with the correct configuraiton:
+ ``` 
+    export CODE_BUCKET=demo-rds-backup-sync
+     
+    export SOURCE_PROFILE=demo-prod-admin 
+    export SOURCE_ACCOUNT_ID=changeme-source-accountid
+     
+    export DST_PROFILE=demo-bunker-admin 
+    export DST_ACCOUNT_ID=changeme-destination-accountid
+```
+* Execute the root make target `make all`
+  * This will:
+    * Create the S3 buckets in each account
+    * Zip and copy the apps to S3
+    * Deploy the source and destination resources via CloudFormation stacks
+      * Templates will deploy with mostly default parameters.
+    * Delete the temporary S3 buckets
+* You can then update the configuration of the CloudFormation 
+stacks via the AWS Console and change parameters as defined below.
 
 
 ### Source Account

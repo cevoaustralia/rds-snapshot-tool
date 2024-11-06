@@ -20,7 +20,7 @@ S3DEST?=[YOUR BUCKET HERE]
 
 # Set these if, for example, you use profiles on the AWS command line
 # or if your 'aws' executable is in a weird place.
-AWSARGS=--region [YOUR REGION] --profile [YOUR PROFILE, or 'default', or remove this]
+AWSARGS?=--region ap-southeast-2
 AWSCMD=aws
 ZIPCMD=zip
 
@@ -41,8 +41,7 @@ clean:
 	rm -f ._*
 
 ._%: %.zip
-	"$(AWSCMD)" $(AWSARGS) s3 cp "$<" "s3://$(S3DEST)" \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+	"$(AWSCMD)" $(AWSARGS) s3 cp "$<" "s3://$(S3DEST)"
 	cp "$<" "$@"
 
 # This rule is a BSD make style rule that says "to make foo.zip, call
