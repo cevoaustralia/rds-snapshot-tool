@@ -20,6 +20,11 @@
 			"Default": "000000000000",
 			"Description": "Destination account with no dashes."
 		},
+		"EnableSnapshots": {
+			"Type": "String",
+			"Default": "TRUE",
+			"AllowedValues": ["TRUE", "FALSE"]
+		},
 		"ShareSnapshots": {
 			"Type": "String",
 			"Default": "TRUE",
@@ -72,6 +77,11 @@
 		"Share": {
 			"Fn::Equals": [{
 				"Ref": "ShareSnapshots"
+			}, "TRUE"]
+		},
+		"SnapshotsActive": {
+			"Fn::Equals": [{
+				"Ref": "EnableSnapshots"
 			}, "TRUE"]
 		},
 		"DeleteOld": {
@@ -265,6 +275,7 @@
 		},
 		"lambdaTakeSnapshotsRDS": {
 			"Type": "AWS::Lambda::Function",
+			"Condition": "SnapshotsActive",
 			"Properties": {
 				"Code": {
 					"S3Bucket": {
@@ -407,6 +418,7 @@
 		},
 		"stateMachineTakeSnapshotsRDS": {
 			"Type": "AWS::StepFunctions::StateMachine",
+			"Condition": "SnapshotsActive",
 			"Properties": {
 				"DefinitionString": {
 					"Fn::Join": ["", [{
@@ -645,6 +657,7 @@
 		},
 		"cwloggrouplambdaTakeSnapshotsRDS":{
 			"Type": "AWS::Logs::LogGroup",
+			"Condition": "SnapshotsActive",
 			"Description": "Log group for the lambdaTakeSnapshotsRDS function's logs",
 			"DependsOn": "lambdaTakeSnapshotsRDS",
 			"Properties": {
